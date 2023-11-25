@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='style/home.css')}}"
+    />
+    <script
+      src="https://kit.fontawesome.com/5eabe89611.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>Uber</title>
+  </head>
+  <body>
+    {% include 'components/navbar_before.html' %}
+
+    <div class="main-screen">
+      <div class="home-left">
+        <div class="home-left-wrapper">
+          <h1>Always the ride you want</h1>
+          <div class="direction-input-form">
+            <p>Request a ride, hop in, and go.</p>
+            <form action="" id="directionHomeForm">
+                <i class="fa-solid fa-circle-dot"></i>
+                <i class="fa-solid fa-square"></i>
+                <i class="fa-solid fa-square"></i>
+                <i id="getLocation" class="fa-solid fa-location-arrow"></i>
+                <div class="line"></div>
+              <input type="text" placeholder="Enter location"/>
+              <input type="text" placeholder="Enter destination" />
+              <div class="home-btn">
+                <button>
+                  <span>See Prices</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="home-right">
+        <img
+          src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_698,h_873/v1535561347/assets/c1/8549ef-09f1-4b5c-be32-7c597a45fa10/original/D_Rider_Header_Global1x.png"
+          alt=""
+        />
+      </div>
+    </div>
+
+    <script src="{{url_for('static', filename='scripts/home.js')}}"></script>
+  </body>
+</html>
