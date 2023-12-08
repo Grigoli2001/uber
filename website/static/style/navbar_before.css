@@ -47,3 +47,16 @@ nav{
     }
 }
 
+.drop_down_menu{
+    position: absolute;
+    background-color: black;
+    width: 100%;
+    top: 55px;
+    left: 0;
+    padding: 0 50px;
+    z-index: 1;
+}
+
+.drop_down_menu .hidden{
+    display: none;
+}

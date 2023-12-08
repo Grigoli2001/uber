@@ -70,7 +70,7 @@
         
         & i:nth-child(2){
             position: absolute;
-            top: 52%;
+            top: 52.5%;
             left: 11px;
             z-index:999;
             color: white;

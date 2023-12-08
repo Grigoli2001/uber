@@ -1,6 +1,7 @@
 from website import create_app
 # import subprocess
 import logging
+from flask_mail import Mail
 from flask_debugtoolbar import DebugToolbarExtension
 from flask import g, request
 import os
@@ -18,6 +19,14 @@ logging.basicConfig( level=logging.DEBUG)
 
 toolbar = DebugToolbarExtension(app)
 
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT'))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') is not None
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+
+mail = Mail(app)
 
 @app.teardown_appcontext
 def app_teardown(exception):

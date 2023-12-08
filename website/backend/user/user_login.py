@@ -12,7 +12,15 @@ class User(UserMixin):
     def __init__(self,id):
         self.id = id
         self.email = None
-        self.password = None    
+        self.password = None
+        self.profile_pic = None
+        self.fullname = None
+        self.authenticated = False
+        self.role = None # admin, user, driver
+        self.car_type = None
+        self.car_number = None
+        self.phone_number = None
+        
     def is_anonymous(self):
          return False
     def is_authenticated(self):
@@ -23,7 +31,21 @@ class User(UserMixin):
          return self.id
     def __repr__(self):
         return '<User %r>' % (self.fullname)
-
+    def is_admin(self):
+        if self.role == 'admin':
+            return True
+    def is_user(self):
+        if self.role == 'user':
+            return True
+    def is_driver(self):
+        if self.role == 'driver':
+            return True
+    def getCarType(self):
+        return self.car_type    
+    def getCarNumber(self):
+        return self.car_number
+    def getPhoneNumber(self):
+        return self.phone_number
 
 
 @login_manager.user_loader

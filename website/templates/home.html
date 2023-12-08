@@ -14,7 +14,12 @@
     <title>Uber</title>
   </head>
   <body>
+    {% if current_user.is_authenticated %}
+    {% include 'components/navbar_after.html' %}
+    {% else %}
     {% include 'components/navbar_before.html' %}
+    {% endif %}
+    
 
     <div class="main-screen">
       <div class="home-left">
@@ -48,5 +53,6 @@
     </div>
 
     <script src="{{url_for('static', filename='scripts/home.js')}}"></script>
+    <script src="{{url_for('static', filename='scripts/navbar.js')}}"></script>
   </body>
 </html>
