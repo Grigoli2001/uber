@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='style/ride_navbar.css')}}"
+    />
+    <script
+      src="https://kit.fontawesome.com/5eabe89611.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-left">
+        <p onclick="location.assign('/')">Uber</p>
+      </div>
+      <div class="nav-right">
+        <a href="/">
+          <span>Home</span>
+        </a>
+        <div class="my_trips">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>My Trips</span>
+        </div>
+        <div class="profile" id="profileDiv">
+          <img src="{{current_user.profile_pic}}" alt="" />
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+      </div>
+    </nav>
+    <div class="drop_down_menu hidden" id="dropDownMenu">
+      <div class="menu-btn">
+        <i class="fa-solid fa-user"></i>
+        <span>Manage Account</span>
+      </div>
+      <div class="menu-btn">
+        <i class="fa-solid fa-cog"></i>
+        <span>Settings</span>
+      </div>
+      <div class="menu-btn" onclick="location.assign('/logout')">
+        <i class="fa-solid fa-sign-out"></i>
+        <span>Logout</span>
+      </div>
+    </div>
+
+    <script src="{{url_for('static', filename='scripts/ride_navbar.js')}}"></script>
+  </body>
+</html>

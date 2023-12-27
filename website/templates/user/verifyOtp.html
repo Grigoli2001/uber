@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify</title>
+  </head>
+  <body>
+    {% include 'components/blank_navbar.html' %}
+    <div class="content_container">
+      <div class="login_wrapper">
+        <h2>Enter the OTP sent to your phone number</h2>
+        <form action="" autocomplete="off" method="post">
+          {{ form.csrf_token }} {{ form.hidden_tag() }}{{
+          form.otp1(class="otp_input", autocomplete="false",
+          inputmode="numeric", maxlength="1") }} {{ form.otp2(class="otp_input",
+          autocomplete="false", inputmode="numeric", maxlength="1") }} {{
+          form.otp3(class="otp_input", autocomplete="false",inputmode="numeric",
+          maxlength="1") }} {{ form.otp4(class="otp_input",
+          autocomplete="false",inputmode="numeric", maxlength="1") }} {% with
+          messages = get_flashed_messages() %} {% if messages %}
+          <div class="flash-messages">
+            {% for message in messages %}
+            <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+          </div>
+          {% endif %} {% endwith %} {{form.submit(class="submit_btn")}}
+        </form>
+      </div>
+      <div class="login_footer">
+        <span
+          >By proceeding, you consent to get calls, WhatsApp or SMS messages,
+          including by automated means, from Uber and its affiliates to the
+          number provided.</span
+        >
+        <span
+          >This site is protected by reCAPTCHA and the Google Privacy Policy and
+          Terms of Service apply.</span
+        >
+      </div>
+    </div>
+  </body>
+</html>

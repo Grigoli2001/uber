@@ -7,7 +7,6 @@ from flask import g, request
 import os
 from dotenv import load_dotenv
 import time
-
 from website.backend.APIs.sqLite import close_db
 
 app = create_app()
@@ -27,6 +26,7 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
+
 
 @app.teardown_appcontext
 def app_teardown(exception):

@@ -14,12 +14,9 @@
     <title>Uber</title>
   </head>
   <body>
-    {% if current_user.is_authenticated %}
-    {% include 'components/navbar_after.html' %}
-    {% else %}
-    {% include 'components/navbar_before.html' %}
-    {% endif %}
-    
+    {% if current_user.is_authenticated %} {% include
+    'components/ride_navbar.html' %} {% else %} {% include
+    'components/navbar_before.html' %} {% endif %}
 
     <div class="main-screen">
       <div class="home-left">
@@ -27,16 +24,26 @@
           <h1>Always the ride you want</h1>
           <div class="direction-input-form">
             <p>Request a ride, hop in, and go.</p>
-            <form action="" id="directionHomeForm">
-                <i class="fa-solid fa-circle-dot"></i>
-                <i class="fa-solid fa-square"></i>
-                <i class="fa-solid fa-square"></i>
-                <i id="getLocation" class="fa-solid fa-location-arrow"></i>
-                <div class="line"></div>
-              <input type="text" placeholder="Enter location"/>
-              <input type="text" placeholder="Enter destination" />
+            <form action="/ride" method="post" id="directionHomeForm">
+              <i class="fa-solid fa-circle-dot"></i>
+              <i class="fa-solid fa-square"></i>
+              <i class="fa-solid fa-square"></i>
+              <i id="getLocation" class="fa-solid fa-location-arrow"></i>
+              <div class="line"></div>
+              <input
+                type="text"
+                id="startLocationHome"
+                placeholder="Enter location"
+                name="pickup"
+              />
+              <input
+                type="text"
+                id="endLocationHome"
+                placeholder="Enter destination"
+                name="destination"
+              />
               <div class="home-btn">
-                <button>
+                <button type="submit">
                   <span>See Prices</span>
                 </button>
               </div>
@@ -53,6 +60,42 @@
     </div>
 
     <script src="{{url_for('static', filename='scripts/home.js')}}"></script>
-    <script src="{{url_for('static', filename='scripts/navbar.js')}}"></script>
+    <script>
+      ((g) => {
+        var h,
+          a,
+          k,
+          p = 'The Google Maps JavaScript API',
+          c = 'google',
+          l = 'importLibrary',
+          q = '__ib__',
+          m = document,
+          b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}),
+          r = new Set(),
+          e = new URLSearchParams(),
+          u = () =>
+            h ||
+            (h = new Promise(async (f, n) => {
+              await (a = m.createElement('script'));
+              e.set('libraries', [...r] + '');
+              for (k in g)
+                e.set(
+                  k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()),
+                  g[k]
+                );
+              e.set('callback', c + '.maps.' + q);
+              a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+              d[q] = f;
+              a.onerror = () => (h = n(Error(p + ' could not load.')));
+              a.nonce = m.querySelector('script[nonce]')?.nonce || '';
+              m.head.append(a);
+            }));
+        d[l]
+          ? console.warn(p + ' only loads once. Ignoring:', g)
+          : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+      })({ key: 'AIzaSyBeVwCxrq7kFUyO8ZwkiWVtoXtFWJHbGCs', v: 'weekly' });
+    </script>
   </body>
 </html>

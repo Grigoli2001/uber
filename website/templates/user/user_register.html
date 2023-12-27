@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    {% include 'components/blank_navbar.html' %}
+
+    <div class="container">
+      <div class="register_wrapper">
+        <h2>Register</h2>
+        <form autocomplete="off" method="post">
+          {{ form.csrf_token }} {{ form.hidden_tag() }} {{
+          form.firstname(placeholder="First Name") }} {{ form.lastname(
+          placeholder="Last Name")}} {{form.phone_number
+          (placeholder="MobileNumber")}} {% with messages =
+          get_flashed_messages() %} {% if messages %}
+          <div class="flash-messages">
+            {% for message in messages %}
+            <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+          </div>
+          {% endif %} {% endwith %}{{ form.submit(class="submit_btn") }}
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

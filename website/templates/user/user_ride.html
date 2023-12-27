@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <title>Simple Map</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{url_for('static', filename='style/ride.css')}}"
+    />
+    <script
+      type="module"
+      src="{{url_for('static', filename='scripts/maps.js')}}"
+    ></script>
+  </head>
+  <body>
+    {% include 'components/ride_navbar.html' %}
+    <div class="container">
+      <div class="autocompleteDiv">
+        <span>Get a ride</span>
+        <form action="">
+          <label for="startLocation">Pick Up</label>
+          <input
+            id="startLocation"
+            type="text"
+            placeholder="Enter a location"
+          />
+          <label for="endLocation">Destination</label>
+          <input type="text" id="endLocation" />
+          <button type="submit" id="submitBtn">Search</button>
+        </form>
+        <div class="distance" id="distance"></div>
+        <div class="distance" id="duration"></div>
+      </div>
+      <div class="taxi_container">dsaads</div>
+      <div id="map">
+        <div id="loader">
+          <i class="fa-solid fa-spinner"></i>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      ((g) => {
+        var h,
+          a,
+          k,
+          p = 'The Google Maps JavaScript API',
+          c = 'google',
+          l = 'importLibrary',
+          q = '__ib__',
+          m = document,
+          b = window;
+        b = b[c] || (b[c] = {});
+        var d = b.maps || (b.maps = {}),
+          r = new Set(),
+          e = new URLSearchParams(),
+          u = () =>
+            h ||
+            (h = new Promise(async (f, n) => {
+              await (a = m.createElement('script'));
+              e.set('libraries', [...r] + '');
+              for (k in g)
+                e.set(
+                  k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()),
+                  g[k]
+                );
+              e.set('callback', c + '.maps.' + q);
+              a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+              d[q] = f;
+              a.onerror = () => (h = n(Error(p + ' could not load.')));
+              a.nonce = m.querySelector('script[nonce]')?.nonce || '';
+              m.head.append(a);
+            }));
+        d[l]
+          ? console.warn(p + ' only loads once. Ignoring:', g)
+          : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+      })({ key: 'AIzaSyBeVwCxrq7kFUyO8ZwkiWVtoXtFWJHbGCs', v: 'weekly' });
+    </script>
+
+    {% if pickup %}
+    <script>
+      var pickup = '{{pickup | safe}}';
+      var destination = '{{destination | safe}}';
+      console.log(pickup, destination, 'hello');
+      document.getElementById('startLocation').value = pickup;
+      document.getElementById('endLocation').value = destination;
+    </script>
+    {% endif %}
+  </body>
+</html>
