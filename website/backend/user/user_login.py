@@ -5,7 +5,7 @@ from ..APIs.sqLite import conn_db
 from ... import login_manager
 from flask_login import LoginManager
 from ..forms.forms import LoginForm, OtpForm
-
+import logging
 login_blueprint = Blueprint('login_blueprint',__name__)
 
 
@@ -109,21 +109,21 @@ def email_exists(email, role):
 def login_logic():
     form = LoginForm()
     if current_user.is_authenticated:
-         print("user is authenticated")
+         logging.info("user is authenticated")
          return redirect(url_for('root.home'))
     if form.validate_on_submit():
-        print("form validated")
+        logging.info("form validated")
         email = form.email.data.lower()
         session['email'] = email
         user = email_exists(email, 'user')
         
         if user:
-            print("user exists")
+            logging.info( email + " user exists")
             # Us = load_user(user[0])
             # login_user(Us)
             return redirect(url_for('login_blueprint.verifyOtpExisting'))
         else:
-            print("user doesn't exist")
+            logging.info(email + " user doesn't exist")
             return redirect(url_for('login_blueprint.verifyOtp'))
 
     return render_template('/user/user_login.html', form = form)
@@ -135,7 +135,7 @@ def verifyOtpExisting():
         return redirect(url_for('login_blueprint.login_logic'))
     form = OtpForm()
     if form.validate_on_submit():
-        print("form validated")
+        logging.info("form validated")
         otp1 = form.otp1.data
         otp2 = form.otp2.data
         otp3 = form.otp3.data
@@ -152,9 +152,9 @@ def verifyOtpExisting():
             session.pop('email', None)
             return redirect(url_for('root.home'))
         flash("OTP is incorrect")
-    
-    from ..APIs.otp import send_2fa_email
-    send_2fa_email(session['email'])
+    else:
+        from ..APIs.otp import send_2fa_email
+        send_2fa_email(session['email'])
     return render_template('/user/verifyOtp.html' , form = form)
 
 @login_blueprint.route('/verifyNew',methods = ['GET','POST'])
@@ -172,13 +172,14 @@ def verifyOtp():
         otp = int(otp1+otp2+otp3+otp4)
         from ..APIs.otp import verify_2fa
         if verify_2fa(otp):
-            print("otp verified")
+            logging.info("otp verified")
             
             return redirect(url_for('register.registration'))
         
         flash("OTP is incorrect")
-    from ..APIs.otp import send_2fa_email
-    send_2fa_email(session['email'])
+    else:
+        from ..APIs.otp import send_2fa_email
+        send_2fa_email(session['email'])
     return render_template('/user/verifyOtp.html' , form = form)
 
 
@@ -188,21 +189,21 @@ def verifyOtp():
 def driver_login_logic():
     form = LoginForm()
     if current_user.is_authenticated:
-            print("user is authenticated")
+            logging.info("user is authenticated")
             return redirect(url_for('root.home'))
     if form.validate_on_submit():
-        print("form validated")
+        logging.info("form validated")
         email = form.email.data.lower()
         session['email'] = email
         user = email_exists(email,'driver')
         
         if user:
-            print("user exists")
+            logging.info( email + " user exists")
             # Us = load_user(user[0])
             # login_user(Us)
             return redirect(url_for('login_blueprint.verifyOtpDriver'))
         else:
-            print("user doesn't exist")
+            logging.info(email + " user doesn't exist")
             return redirect(url_for('login_blueprint.verifyOtpDriverNew'))
     
     return render_template('/driver/driver_login.html', form = form)
@@ -213,7 +214,7 @@ def verifyOtpDriver():
         return redirect(url_for('login_blueprint.login_logic'))
     form = OtpForm()
     if form.validate_on_submit():
-        print("form validated")
+        logging.info("form validated")
         otp1 = form.otp1.data
         otp2 = form.otp2.data
         otp3 = form.otp3.data
@@ -228,11 +229,11 @@ def verifyOtpDriver():
             Us = load_user(user[0])
             login_user(Us)
             session.pop('email', None)
-            return redirect(url_for('root.home'))
+            return redirect(url_for('driver.home'))
         flash("OTP is incorrect")
-    
-    from ..APIs.otp import send_2fa_email
-    send_2fa_email(session['email'])
+    else:
+        from ..APIs.otp import send_2fa_email
+        send_2fa_email(session['email'])
     return render_template('/user/verifyOtp.html' , form = form)
 
 @login_blueprint.route('/driver/verifyNew' , methods = ['GET','POST'])
@@ -241,7 +242,7 @@ def verifyOtpDriverNew():
         return redirect(url_for('login_blueprint.login_logic'))
     form = OtpForm()
     if form.validate_on_submit():
-        print("form validated")
+        logging.info("form validated")
         otp1 = form.otp1.data
         otp2 = form.otp2.data
         otp3 = form.otp3.data
@@ -249,11 +250,10 @@ def verifyOtpDriverNew():
         otp = int(otp1+otp2+otp3+otp4)
         from ..APIs.otp import verify_2fa
         if verify_2fa(otp):
-            print("otp verified")
-            
+            logging.info("otp verified")
             return redirect(url_for('register.driver_registration'))
-        
         flash("OTP is incorrect")
-    from ..APIs.otp import send_2fa_email
-    send_2fa_email(session['email'])
+    else:
+        from ..APIs.otp import send_2fa_email
+        send_2fa_email(session['email'])
     return render_template('/user/verifyOtp.html' , form = form)

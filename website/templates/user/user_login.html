@@ -17,13 +17,18 @@
     {% include 'components/blank_navbar.html' %}
     <div class="content_container">
       <div class="login_wrapper">
-        <h2>What's your phone number or email?</h2>
+        <h2>Dear customer what's your email?</h2>
         <!--  prettier-ignore -->
 
         <form autocomplete="off" method="post">
           {{ form.csrf_token }} {{ form.hidden_tag() }}{{
           form.email(class="email_input", placeholder="Enter phone number or email", autocomplete="false") }} {{form.submit(class="submit_btn")}}
         </form>
+
+        <p>
+          if you want to log in or register as a driver
+          <a href="/login/driver">click Here</a>
+        </p>
       </div>
       <!-- prettier -->
       <div class="or_wrapper">

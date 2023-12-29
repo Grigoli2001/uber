@@ -22,12 +22,9 @@ def create_app():
 
 #driver Blueprints
 
-    # from .backend.driver.driver_root import driver_root
-    # from .backend.driver.driver_register import driver_register
-    # from .backend.driver.driver_login import driver_login
-    # app.register_blueprint(driver_root,url_prefix='/driver')
-    # app.register_blueprint(driver_register,url_prefix='/driver_register')
-    # app.register_blueprint(driver_login,url_prefix='/driver_login')
+    from.backend.driver.driver_root import driver
+
+    app.register_blueprint(driver,url_prefix='/driver')
 
 #admin Blueprints
 

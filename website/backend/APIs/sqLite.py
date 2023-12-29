@@ -22,7 +22,7 @@ def create_user_table(db):
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL,
             firstname TEXT NOT NULL,
             lastname TEXT NOT NULL,
             phone_number TEXT,
