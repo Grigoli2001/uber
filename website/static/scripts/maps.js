@@ -192,9 +192,9 @@ async function initMap(centerLocation) {
           const { distance, duration, duration_in_traffic } =
             response.routes[0].legs[0];
           document.getElementById('distance').innerHTML =
-            'Distance: ' + distance.text;
+            'Distance: <span id="distanceNumber">' + distance.text + '</span>';
           document.getElementById('duration').innerHTML =
-            'Trip will take approximately: ' + duration_in_traffic.text;
+            'Trip will take approximately: <span id="durationNumber">' + duration_in_traffic.text + '</span>';
           directionsRenderer.setOptions({
             directions: response,
             draggable: false,
@@ -264,4 +264,78 @@ async function initMap(centerLocation) {
   } catch (err) {
     console.log(err);
   }
+  const form = document.getElementById('directionForm');
+  const taxi_container = document.getElementById('taxi_container');
+  const sedanPrice = document.getElementById('sedanPrice');
+  const vanPrice = document.getElementById('vanPrice');
+  const taxiPrice = document.getElementById('taxiPrice');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    taxi_container.style.width = '100%';
+    // Example usage (you can call this function where you handle the route response)
+    // Get selected car type (this is just a placeholder; you may have a UI element to select car type)
+  const selectedCarType = 'SEDAN'; // You can modify this based on user input or some other logic
+
+  // Calculate the price based on the selected car type
+  const totalPrice = calculatePrice(
+    selectedCarType,
+    document.getElementById('distanceNumber').innerHTML,
+    document.getElementById('durationNumber').innerHTML
+  );
+  
+  console.log(`Total Price for ${selectedCarType}: ${totalPrice} currency`);
+  });
 }
+
+
+// Prices for each car type
+const SUV_BASE_FARE = 10; // Base fare for SUV in some currency
+const SUV_DISTANCE_RATE = 3; // Cost per kilometer for SUV in some currency
+const SUV_TIME_RATE = 2; // Cost per minute for SUV in some currency
+
+const SEDAN_BASE_FARE = 7; // Base fare for Sedan in some currency
+const SEDAN_DISTANCE_RATE = 2.5; // Cost per kilometer for Sedan in some currency
+const SEDAN_TIME_RATE = 1.5; // Cost per minute for Sedan in some currency
+
+const TAXI_BASE_FARE = 5; // Base fare for Taxi in some currency
+const TAXI_DISTANCE_RATE = 2; // Cost per kilometer for Taxi in some currency
+const TAXI_TIME_RATE = 1; // Cost per minute for Taxi in some currency
+
+function calculatePrice(carType,distanceText = document.getElementById('distanceNumber').innerHTML, durationInTrafficText = document.getElementById('durationNumber').innerHTML) {
+  // Extract numeric values from distance and duration strings (assuming they are in format like "X km" and "Y mins")
+  const distance = parseFloat(distanceText.split(' ')[0]);
+  const duration = parseFloat(durationInTrafficText.split(' ')[0]);
+
+  let BASE_FARE, DISTANCE_RATE, TIME_RATE;
+
+  // Set rates based on carType
+  switch (carType) {
+    case 'SUV':
+      BASE_FARE = SUV_BASE_FARE;
+      DISTANCE_RATE = SUV_DISTANCE_RATE;
+      TIME_RATE = SUV_TIME_RATE;
+      break;
+    case 'SEDAN':
+      BASE_FARE = SEDAN_BASE_FARE;
+      DISTANCE_RATE = SEDAN_DISTANCE_RATE;
+      TIME_RATE = SEDAN_TIME_RATE;
+      break;
+    case 'TAXI':
+    default:
+      BASE_FARE = TAXI_BASE_FARE;
+      DISTANCE_RATE = TAXI_DISTANCE_RATE;
+      TIME_RATE = TAXI_TIME_RATE;
+      break;
+  }
+
+  // Calculate price based on distance and time using the rates determined above
+  const distanceCost = (distance - 1) * DISTANCE_RATE;
+  const timeCost = (duration - 5) * TIME_RATE;
+
+  // Calculate total price
+  const totalPrice = BASE_FARE + distanceCost + timeCost;
+
+  return totalPrice.toFixed(2); // Return the total price rounded to 2 decimal places
+}
+
+

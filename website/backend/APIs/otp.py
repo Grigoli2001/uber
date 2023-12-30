@@ -1,7 +1,5 @@
 from ..APIs.email import send_email
 import random
-import schedule
-import asyncio
 import threading
 import time
 from flask import session

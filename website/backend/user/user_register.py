@@ -109,7 +109,8 @@ def driver_registration():
             Us = load_user(user[0])
             login_user(Us)
             session.pop('email', None)
-            return redirect(url_for('root.home'))
+            return redirect(url_for('driver.home'))
+        
         
         except Exception as e:
             logging.error(e)

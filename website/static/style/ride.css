@@ -12,6 +12,7 @@ body {
   display: flex;
 }
 .autocompleteDiv {
+
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -20,6 +21,7 @@ body {
   border: 1px solid black;
   height: fit-content;
   border-radius: 10px;
+  margin-right: 20px;
 
   & span {
     font-size: 20px;
@@ -88,4 +90,68 @@ body {
   & .pac-item-query {
     color: white;
   }
+}
+
+.taxi_container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 0;
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+  
+}
+
+.taxi_list{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.taxies{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin-bottom: 3px;
+  cursor: pointer;
+
+  & img{
+    width: 150px;
+    height: 150px;
+    margin-right: 10px;
+  }
+
+  & .car_details{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+
+    & .type > span:first-child{
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      margin-right: 10px;
+    }
+  }
+
+  & .price{
+    font-size: 20px;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+}
+
+.selected{
+  background-color: rgb(240, 240, 240);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 2px solid black;
 }

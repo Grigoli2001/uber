@@ -17,7 +17,8 @@ root = Blueprint('root',__name__)
 
 @root.route('/')
 def home():
-    print(session['code'])
+    if session.get('code'):
+        print(session['code'])
     return render_template('home.html')
 
 @root.route('/users')
@@ -34,6 +35,7 @@ def show_users():
 @root.route('/logout')
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for('login_blueprint.login_logic'))
 
 

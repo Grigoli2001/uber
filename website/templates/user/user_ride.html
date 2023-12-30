@@ -18,7 +18,7 @@
     <div class="container">
       <div class="autocompleteDiv">
         <span>Get a ride</span>
-        <form action="">
+        <form action="" id="directionForm">
           <label for="startLocation">Pick Up</label>
           <input
             id="startLocation"
@@ -32,7 +32,44 @@
         <div class="distance" id="distance"></div>
         <div class="distance" id="duration"></div>
       </div>
-      <div class="taxi_container">dsaads</div>
+      <div class="taxi_container" id="taxi_container">
+        <h2>Choose your ride</h2>
+        <div class="taxi_list">
+          <div class="taxies" id="sedan">
+            <img src="static\assets\QuickieBlack.png" alt="" />
+            <div class="car_details">
+              <div class="type">
+                <span>Sedan</span><i class="fa-solid fa-user"></i>
+                <span>4</span>
+              </div>
+              <span>2 mins away</span>
+            </div>
+            <div class="price" id="sedanPrice">20$</div>
+          </div>
+          <div class="taxies">
+            <img src="static\assets\Van.png" alt="" />
+            <div class="car_details">
+              <div class="type">
+                <span>Van</span><i class="fa-solid fa-user"></i>
+                <span>6</span>
+              </div>
+              <span>2 mins away</span>
+            </div>
+            <div class="price" id="vanPrice">30$</div>
+          </div>
+          <div class="taxies selected">
+            <img src="static\assets\Taxi.png" alt="" />
+            <div class="car_details">
+              <div class="type">
+                <span>Taxi</span><i class="fa-solid fa-user"></i>
+                <span>4</span>
+              </div>
+              <span>2 mins away</span>
+            </div>
+            <div class="price" id="taxiPrice">15$</div>
+          </div>
+        </div>
+      </div>
       <div id="map">
         <div id="loader">
           <i class="fa-solid fa-spinner"></i>
@@ -45,10 +82,10 @@
         var h,
           a,
           k,
-          p = 'The Google Maps JavaScript API',
-          c = 'google',
-          l = 'importLibrary',
-          q = '__ib__',
+          p = "The Google Maps JavaScript API",
+          c = "google",
+          l = "importLibrary",
+          q = "__ib__",
           m = document,
           b = window;
         b = b[c] || (b[c] = {});
@@ -58,33 +95,33 @@
           u = () =>
             h ||
             (h = new Promise(async (f, n) => {
-              await (a = m.createElement('script'));
-              e.set('libraries', [...r] + '');
+              await (a = m.createElement("script"));
+              e.set("libraries", [...r] + "");
               for (k in g)
                 e.set(
-                  k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()),
+                  k.replace(/[A-Z]/g, (t) => "_" + t[0].toLowerCase()),
                   g[k]
                 );
-              e.set('callback', c + '.maps.' + q);
+              e.set("callback", c + ".maps." + q);
               a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
               d[q] = f;
-              a.onerror = () => (h = n(Error(p + ' could not load.')));
-              a.nonce = m.querySelector('script[nonce]')?.nonce || '';
+              a.onerror = () => (h = n(Error(p + " could not load.")));
+              a.nonce = m.querySelector("script[nonce]")?.nonce || "";
               m.head.append(a);
             }));
         d[l]
-          ? console.warn(p + ' only loads once. Ignoring:', g)
+          ? console.warn(p + " only loads once. Ignoring:", g)
           : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
-      })({ key: 'AIzaSyBeVwCxrq7kFUyO8ZwkiWVtoXtFWJHbGCs', v: 'weekly' });
+      })({ key: "AIzaSyBeVwCxrq7kFUyO8ZwkiWVtoXtFWJHbGCs", v: "weekly" });
     </script>
 
     {% if pickup %}
     <script>
-      var pickup = '{{pickup | safe}}';
-      var destination = '{{destination | safe}}';
-      console.log(pickup, destination, 'hello');
-      document.getElementById('startLocation').value = pickup;
-      document.getElementById('endLocation').value = destination;
+      var pickup = "{{pickup | safe}}";
+      var destination = "{{destination | safe}}";
+      console.log(pickup, destination, "hello");
+      document.getElementById("startLocation").value = pickup;
+      document.getElementById("endLocation").value = destination;
     </script>
     {% endif %}
   </body>
