@@ -7,6 +7,16 @@ let location = false;
 let currentLocation = false;
 const mapDiv = document.getElementById('map');
 const loader = document.getElementById('loader');
+const taxies = document.getElementsByClassName('taxies');
+
+for (let i = 0; i < taxies.length; i++) {
+  taxies[i].addEventListener('click', () => {
+    for (let j = 0; j < taxies.length; j++) {
+      taxies[j].classList.remove('selected');
+    }
+    taxies[i].classList.add('selected');
+  });
+}
 // Get current location
 // navigator.geolocation.getCurrentPosition(
 //   (position) => {
@@ -271,19 +281,26 @@ async function initMap(centerLocation) {
   const taxiPrice = document.getElementById('taxiPrice');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    taxi_container.style.width = '100%';
-    // Example usage (you can call this function where you handle the route response)
-    // Get selected car type (this is just a placeholder; you may have a UI element to select car type)
-  const selectedCarType = 'SEDAN'; // You can modify this based on user input or some other logic
 
-  // Calculate the price based on the selected car type
+    taxi_container.style.width = '0%';
+    loader.style.display = 'flex';
+    setTimeout(() => {
+      taxi_container.style.width = '100%';
+    }
+    , 1000);
+    loader.style.display = 'none';
+      
+
+  // Calculate the price
   const totalPrice = calculatePrice(
-    selectedCarType,
     document.getElementById('distanceNumber').innerHTML,
     document.getElementById('durationNumber').innerHTML
   );
+
+  sedanPrice.innerHTML = totalPrice['Sedan'];
+  vanPrice.innerHTML = totalPrice['SUV'];
+  taxiPrice.innerHTML = totalPrice['Taxi'];
   
-  console.log(`Total Price for ${selectedCarType}: ${totalPrice} currency`);
   });
 }
 
@@ -301,41 +318,26 @@ const TAXI_BASE_FARE = 5; // Base fare for Taxi in some currency
 const TAXI_DISTANCE_RATE = 2; // Cost per kilometer for Taxi in some currency
 const TAXI_TIME_RATE = 1; // Cost per minute for Taxi in some currency
 
-function calculatePrice(carType,distanceText = document.getElementById('distanceNumber').innerHTML, durationInTrafficText = document.getElementById('durationNumber').innerHTML) {
-  // Extract numeric values from distance and duration strings (assuming they are in format like "X km" and "Y mins")
+function calculatePrice(distanceText , durationInTrafficText) {
+
+  // Get the distance in km
   const distance = parseFloat(distanceText.split(' ')[0]);
-  const duration = parseFloat(durationInTrafficText.split(' ')[0]);
 
-  let BASE_FARE, DISTANCE_RATE, TIME_RATE;
+  // Get the duration in minutes
+  const durationInTraffic = parseFloat(durationInTrafficText.split(' ')[0]);
 
-  // Set rates based on carType
-  switch (carType) {
-    case 'SUV':
-      BASE_FARE = SUV_BASE_FARE;
-      DISTANCE_RATE = SUV_DISTANCE_RATE;
-      TIME_RATE = SUV_TIME_RATE;
-      break;
-    case 'SEDAN':
-      BASE_FARE = SEDAN_BASE_FARE;
-      DISTANCE_RATE = SEDAN_DISTANCE_RATE;
-      TIME_RATE = SEDAN_TIME_RATE;
-      break;
-    case 'TAXI':
-    default:
-      BASE_FARE = TAXI_BASE_FARE;
-      DISTANCE_RATE = TAXI_DISTANCE_RATE;
-      TIME_RATE = TAXI_TIME_RATE;
-      break;
-  }
+  // Calculate the price
+  let totalPrice = {'SUV': 0, 'Sedan': 0, 'Taxi': 0};
 
-  // Calculate price based on distance and time using the rates determined above
-  const distanceCost = (distance - 1) * DISTANCE_RATE;
-  const timeCost = (duration - 5) * TIME_RATE;
+  // Calculate the price for SUV
+  totalPrice['SUV'] = SUV_BASE_FARE + (distance * SUV_DISTANCE_RATE) + (durationInTraffic * SUV_TIME_RATE);
 
-  // Calculate total price
-  const totalPrice = BASE_FARE + distanceCost + timeCost;
+  // Calculate the price for Sedan
+  totalPrice['Sedan'] = SEDAN_BASE_FARE + (distance * SEDAN_DISTANCE_RATE) + (durationInTraffic * SEDAN_TIME_RATE);
 
-  return totalPrice.toFixed(2); // Return the total price rounded to 2 decimal places
+  // Calculate the price for Taxi
+  totalPrice['Taxi'] = TAXI_BASE_FARE + (distance * TAXI_DISTANCE_RATE) + (durationInTraffic * TAXI_TIME_RATE);
+  return totalPrice;
+
 }
-
 

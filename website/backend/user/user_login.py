@@ -75,7 +75,7 @@ def load_user(user_id):
         cur_user.phone_number = user[4]
         cur_user.role = user[5]
         if user[6]:
-            cur_user.profile_pic = user[6]
+            cur_user.profile_pic = f"/{user[6]}"
         if user[7]:
             cur_user.password = user[7]
         if user[8]:
@@ -224,8 +224,9 @@ def verifyOtpDriver():
         if verify_2fa(otp):
             db = conn_db()
             cursor = db.cursor()
-            cursor.execute('SELECT * FROM users WHERE email = ?',(session['email'],))
+            cursor.execute('SELECT * FROM users WHERE email = ? and role = ?',(session['email'], 'driver'))
             user = cursor.fetchone()
+            print(user)
             Us = load_user(user[0])
             login_user(Us)
             session.pop('email', None)

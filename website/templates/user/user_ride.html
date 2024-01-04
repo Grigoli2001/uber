@@ -24,9 +24,10 @@
             id="startLocation"
             type="text"
             placeholder="Enter a location"
+            required
           />
           <label for="endLocation">Destination</label>
-          <input type="text" id="endLocation" />
+          <input required type="text" id="endLocation" />
           <button type="submit" id="submitBtn">Search</button>
         </form>
         <div class="distance" id="distance"></div>
@@ -68,6 +69,18 @@
             </div>
             <div class="price" id="taxiPrice">15$</div>
           </div>
+          <form id="requestRideForm">
+            <input type="hidden" name="startLocation" id="startLocation" />
+            <input type="hidden" name="endLocation" id="endLocation" />
+            <input type="hidden" name="taxiType" id="taxiType" value="taxi" />
+            <input type="hidden" name="taxiPrice" id="taxiPrice" value="15" />
+            <input type="hidden" name="vanPrice" id="vanPrice" value="30" />
+            <input type="hidden" name="sedanPrice" id="sedanPrice" value="20" />
+            <input type="hidden" name="distance" id="distance" />
+            <input type="hidden" name="duration" id="duration" />
+            <button type="submit" id="requestRideBtn">Request Ride</button>
+          </form>
+          </form>
         </div>
       </div>
       <div id="map">
