@@ -8,8 +8,10 @@ import os
 from dotenv import load_dotenv
 import time
 from website.backend.APIs.sqLite import close_db
+from flask_socketio import SocketIO
 
 app = create_app()
+socketio = SocketIO(app, cors_allowed_origins="*")  # cors_allowed_origins="*" allows connections from any origin
 
 load_dotenv()
 # Configure logging settings
@@ -44,5 +46,5 @@ def after_request(response):
     return response
 
 if __name__ =='__main__':
-    app.run(host=os.getenv("HOST"),port=os.getenv("PORT"),debug=os.getenv("DEBUG"))
+    socketio.run(app, host=os.getenv("HOST"), port=os.getenv("PORT"), debug=os.getenv("DEBUG"))
 

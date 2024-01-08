@@ -5,6 +5,9 @@ from ..APIs.sqLite import conn_db
 from ..APIs.mongoDB import client
 from bson import ObjectId
 from datetime import datetime
+from flask_socketio import emit
+from threading import Thread
+from pymongo.errors import OperationFailure
 
 driver = Blueprint('driver', __name__)
 
@@ -14,6 +17,8 @@ def home():
     db = client['uber']
     collection = db['ride_requests']
     ride_requests = collection.find()
+    logging.info(ride_requests)
+    Thread(target=check_for_updates).start()
     return render_template('driver/driver_home.html', ride_requests=ride_requests)
 
 
@@ -45,4 +50,25 @@ def accept_ride():
     db = client['uber']
     collection = db['ride_requests']
     collection.update_one({'_id': ObjectId(ride_id)}, {'$set': {'status': 'accepted'}})
+
+    # send a socket message to the user
+    emit('ride_updated', {'message': 'Ride status updated!'}, broadcast=True, namespace='/')
+
     return jsonify({'status': 'success', 'message': 'Ride accepted'}), 200
+
+
+# check for changes in ride_requests collection to notify the socket
+def check_for_updates():
+    db = client['uber']
+    logging.info('Starting thread for checking updates.')
+    
+    try:
+        collection = db['ride_requests']
+        
+        # Use change_stream method to watch for updates
+        with collection.watch(full_document='updateLookup') as stream:
+            for change in stream:
+                logging.info(change)
+                emit('ride_updated', {'message': 'Ride status updated!'}, broadcast=True, namespace='/')
+    except OperationFailure as e:
+        logging.error(f"Error while watching for updates: {e}")

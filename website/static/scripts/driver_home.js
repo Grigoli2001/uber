@@ -25,4 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
             handleAccept(e, requestId);
         });
     });
+
+
+    const socket = io.connect('http://localhost:2000');
+    socket.on('connect', () => {
+        console.log('connected');
+    });
+// emit('ride_updated', {'message': 'Ride status updated!'}, broadcast=True, namespace='/')
+
+    socket.on('ride_updated', (data) => {
+        const { message } = data;
+        console.log(message);
+    });
+
 });

@@ -67,7 +67,7 @@ def ride_request():
     logging.info(f'User ID: {user_id}')
     db = client['uber']
     collection = db['ride_requests']
-
+    all_requests = db['all_requests']
     # Check if user has already requested a ride
     ride_request = collection.find_one({'user_id': user_id})
     if ride_request:
@@ -79,8 +79,18 @@ def ride_request():
         'pickup': pickup,
         'destination': destination,
         'status': 'pending',
-        'created_at': datetime.now(),
-        'updated_at': datetime.now()
+        'created_at': datetime.now().strftime("%H:%M"),
+        'updated_at': datetime.now().strftime("%H:%M"),
+        'price': price
+    })
+    all_requests.insert_one({
+        'user_id': user_id,
+        'pickup': pickup,
+        'destination': destination,
+        'status': 'pending',
+        'created_at': datetime.now().strftime("%H:%M"),
+        'updated_at': datetime.now().strftime("%H:%M"),
+        'price': price
     })
 
     return jsonify({'status': 'pending', 'message': 'Waiting for driver acceptance'}), 200
@@ -95,6 +105,7 @@ def ride_request_status():
     db = client['uber']
     collection = db['ride_requests']
     ride_request = collection.find_one({'user_id': user_id})
+
     if ride_request['status']:
         if ride_request['status'] == 'pending':
             return jsonify({'status': ride_request['status'], 'message': 'Waiting for driver acceptance', 'pickup' : ride_request['pickup'], 'destination' : ride_request['destination']}), 200
@@ -111,10 +122,16 @@ def ride_request_cancel():
     logging.info(f'User ID: {user_id}')
     db = client['uber']
     collection = db['ride_requests']
+    all_requests = db['all_requests']
     ride_request = collection.find_one({'user_id': user_id})
+    all_request = all_requests.find_one({'user_id': user_id}, {'created_at': ride_request['created_at']})
+    logging.info('cancelling ride request')
+    if all_request:
+        all_requests.update_one({'user_id': user_id}, {'$set': {'status': 'cancelled'}, '$set': {'updated_at': datetime.now().strftime("%H:%M")}})
     if ride_request['status'] == 'pending':
         collection.delete_one({'user_id': user_id})
         return jsonify({'status': 'success', 'message': 'Ride request cancelled'}), 200
     elif ride_request['status'] == 'accepted':
         return jsonify({'status': 'error', 'message': 'Cannot cancel ride request after driver acceptance'}), 400
     return jsonify({'status': 'not_found', 'message': 'No ride request found'}), 404
+
