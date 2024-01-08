@@ -51,3 +51,51 @@ def ride():
         logging.info(f'Pickup: {pickup}, Destination: {destination}')
         return render_template('user/user_ride.html', pickup=pickup, destination=destination)
     return render_template('user/user_ride.html')
+
+@login_required
+@root.route('/ride/request', methods=['POST'])
+def ride_request():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login_blueprint.login_logic'))
+    data = request.json
+    pickup = data['startLocation']
+    destination = data['endLocation']
+    user_id = current_user.get_id()
+    logging.info(f'Pickup: {pickup}, Destination: {destination}')
+    logging.info(f'User ID: {user_id}')
+    db = client['uber']
+    collection = db['ride_requests']
+
+    # Check if user has already requested a ride
+    ride_request = collection.find_one({'user_id': user_id})
+    if ride_request:
+        if ride_request['status'] in ['pending', 'accepted']:
+            # return an error message
+            return jsonify({'status': 'error', 'message': 'You have already requested a ride'}), 400
+    collection.insert_one({
+        'user_id': user_id,
+        'pickup': pickup,
+        'destination': destination,
+        'status': 'pending',
+        'created_at': datetime.now(),
+        'updated_at': datetime.now()
+    })
+
+    return jsonify({'status': 'pending', 'message': 'Waiting for driver acceptance'}), 200
+
+@login_required
+@root.route('/ride/request/status', methods=['POST'])
+def ride_request_status():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login_blueprint.login_logic'))
+    data = request.json
+    user_id = current_user.get_id()
+    logging.info(f'User ID: {user_id}')
+    db = client['uber']
+    collection = db['ride_requests']
+    ride_request = collection.find_one({'user_id': user_id})
+    if ride_request['status'] == 'pending':
+        return jsonify({'status': ride_request['status'], 'message': 'Waiting for driver acceptance'}), 200
+    elif ride_request['status'] == 'accepted':
+        return jsonify({'status': ride_request['status'], 'message': 'Driver accepted your request'}), 200
+    return jsonify({'status': 'not_found', 'message': 'No ride request found'}), 404

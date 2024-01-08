@@ -8,7 +8,7 @@ let currentLocation = false;
 const mapDiv = document.getElementById('map');
 const loader = document.getElementById('loader');
 const taxies = document.getElementsByClassName('taxies');
-
+const requestRideForm = document.getElementById('requestRideForm');
 for (let i = 0; i < taxies.length; i++) {
   taxies[i].addEventListener('click', () => {
     for (let j = 0; j < taxies.length; j++) {
@@ -296,13 +296,70 @@ async function initMap(centerLocation) {
     document.getElementById('distanceNumber').innerHTML,
     document.getElementById('durationNumber').innerHTML
   );
-
+  const taxies = document.getElementsByClassName('taxies');
+  for (let i = 0; i < taxies.length; i++) {
+    taxies[i].setAttribute('data-price', totalPrice[taxies[i].getAttribute('data-type')]);
+  }
   sedanPrice.innerHTML = totalPrice['Sedan'];
   vanPrice.innerHTML = totalPrice['SUV'];
   taxiPrice.innerHTML = totalPrice['Taxi'];
   
   });
-}
+
+  // const requestRideForm = document.getElementById('requestRideForm');
+
+  requestRideForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const selectedTaxi = document.querySelector('.taxies.selected');
+    const taxiType = selectedTaxi.getAttribute('data-type');
+    const taxiPrice = selectedTaxi.getAttribute('data-price');
+    console.log(taxiType, taxiPrice);
+    const distance = document.getElementById('distanceNumber').innerHTML;
+    const duration = document.getElementById('durationNumber').innerHTML;
+    const startLocation = document.getElementById('startLocation').value;
+    const endLocation = document.getElementById('endLocation').value;
+    const data = {
+      taxiType,
+      taxiPrice,
+      distance,
+      duration,
+      startLocation,
+      endLocation,
+    };
+    console.log(data);
+    const res = await fetch('/ride/request', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
+    const resData = await res.json();
+    console.log(resData);
+
+    if (resData.status === 'pending') {
+      const checkStatusInterval = setInterval(async () => {
+        const checkRes = await fetch('/ride/request/status', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        const checkResData = await checkRes.json();
+        console.log(checkResData);
+
+        if (checkResData.status === 'accepted') {
+          clearInterval(checkStatusInterval); // Stop polling
+          window.location.href = '/dashboard'; // Redirect to dashboard or handle accordingly
+        }
+      }, 5000);
+    }
+    else if (resData.status === 'error'){
+      console.log(resData.message);
+      window.alert(resData.message);
+    }
+  }
+)};
 
 
 // Prices for each car type

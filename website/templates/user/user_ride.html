@@ -36,7 +36,7 @@
       <div class="taxi_container" id="taxi_container">
         <h2>Choose your ride</h2>
         <div class="taxi_list">
-          <div class="taxies" id="sedan">
+          <div class="taxies" id="sedan" data-type="Sedan" data-price="20">
             <img src="static\assets\QuickieBlack.png" alt="" />
             <div class="car_details">
               <div class="type">
@@ -47,7 +47,7 @@
             </div>
             <div class="price" id="sedanPrice">20$</div>
           </div>
-          <div class="taxies">
+          <div class="taxies" data-type="SUV" data-price="30">
             <img src="static\assets\Van.png" alt="" />
             <div class="car_details">
               <div class="type">
@@ -58,7 +58,7 @@
             </div>
             <div class="price" id="vanPrice">30$</div>
           </div>
-          <div class="taxies selected">
+          <div class="taxies selected" data-type="Taxi" data-price="15">
             <img src="static\assets\Taxi.png" alt="" />
             <div class="car_details">
               <div class="type">
@@ -70,16 +70,7 @@
             <div class="price" id="taxiPrice">15$</div>
           </div>
           <form id="requestRideForm">
-            <input type="hidden" name="startLocation" id="startLocation" />
-            <input type="hidden" name="endLocation" id="endLocation" />
-            <input type="hidden" name="taxiType" id="taxiType" value="taxi" />
-            <input type="hidden" name="taxiPrice" id="taxiPrice" value="15" />
-            <input type="hidden" name="vanPrice" id="vanPrice" value="30" />
-            <input type="hidden" name="sedanPrice" id="sedanPrice" value="20" />
-            <input type="hidden" name="distance" id="distance" />
-            <input type="hidden" name="duration" id="duration" />
             <button type="submit" id="requestRideBtn">Request Ride</button>
-          </form>
           </form>
         </div>
       </div>
