@@ -9,8 +9,10 @@ locationBtn.addEventListener('click', () => {
     console.log(position);
 
     currentLocation = { lat: latitude, lng: longitude };
-    initAutoComplete();
   });
+});
+window.addEventListener('load', () => {
+  initAutoComplete();
 });
 
 async function initAutoComplete() {

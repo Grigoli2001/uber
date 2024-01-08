@@ -17,8 +17,9 @@ root = Blueprint('root',__name__)
 
 @root.route('/')
 def home():
-    if session.get('code'):
-        print(session['code'])
+    if current_user.is_authenticated:
+        return redirect(url_for('root.ride'))
+    
     return render_template('home.html')
 
 @root.route('/users')
@@ -61,6 +62,7 @@ def ride_request():
     pickup = data['startLocation']
     destination = data['endLocation']
     user_id = current_user.get_id()
+    price = data['taxiPrice']
     logging.info(f'Pickup: {pickup}, Destination: {destination}')
     logging.info(f'User ID: {user_id}')
     db = client['uber']
@@ -93,10 +95,11 @@ def ride_request_status():
     db = client['uber']
     collection = db['ride_requests']
     ride_request = collection.find_one({'user_id': user_id})
-    if ride_request['status'] == 'pending':
-        return jsonify({'status': ride_request['status'], 'message': 'Waiting for driver acceptance', 'pickup' : ride_request['pickup'], 'destination' : ride_request['destination']}), 200
-    elif ride_request['status'] == 'accepted':
-        return jsonify({'status': ride_request['status'], 'message': 'Driver accepted your request'}), 200
+    if ride_request['status']:
+        if ride_request['status'] == 'pending':
+            return jsonify({'status': ride_request['status'], 'message': 'Waiting for driver acceptance', 'pickup' : ride_request['pickup'], 'destination' : ride_request['destination']}), 200
+        elif ride_request['status'] == 'accepted':
+            return jsonify({'status': ride_request['status'], 'message': 'Driver accepted your request'}), 200
     return jsonify({'status': 'not_found', 'message': 'No ride request found'}), 404
 
 @login_required

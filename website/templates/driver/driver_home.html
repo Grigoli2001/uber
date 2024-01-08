@@ -6,6 +6,60 @@
     <title>Document</title>
   </head>
   <body>
-    {% include 'components/ride_navbar.html' %} {{ current_user.profile_pic}}
+    {% include 'components/ride_navbar.html' %}
+
+    <div class="container">
+      {% for requests in ride_requests %}
+      <!-- data in ride request
+      'user_id': user_id,
+        'pickup': pickup,
+        'destination': destination,
+        'status': 'pending',
+        'created_at': datetime.now(),
+        'updated_at': datetime.now()
+      -->
+      <div class="ride_request">
+        <div class="ride_request_details">
+          <div class="ride_request_details_item">
+            <span class="ride_request_details_item_label">Pickup:</span>
+            <span class="ride_request_details_item_value">{{ requests.pickup }}</span>
+          </div>
+          <div class="ride_request_details_item">
+            <span class="ride_request_details_item_label">Destination:</span>
+            <span class="ride_request_details_item_value">{{ requests.destination }}</span>
+          </div>
+          <div class="ride_request_details_item">
+            <span class="ride_request_details_item_label">Status:</span>
+            <span class="ride_request_details_item_value">{{ requests.status }}</span>
+          </div>
+        </div>
+        <div class="ride_request_actions">
+          <form class="acceptForm" data-request-id="{{ requests._id }}">
+            <input type="hidden" name="user_id" value="{{ requests.user_id }}" />
+            <input type="hidden" name="pickup" value="{{ requests.pickup }}" />
+            <input type="hidden" name="destination" value="{{ requests.destination }}" />
+            <input type="hidden" name="status" value="accepted" />
+            <input type="hidden" name="created_at" value="{{ requests.created_at }}" />
+            <input type="hidden" name="updated_at" value="{{ requests.updated_at }}" />
+            <button type="submit">Accept</button>
+          </form>
+          <form class="rejectForm" data-request-id="{{ requests._id }}">
+            <input type="hidden" name="user_id" value="{{ requests.user_id }}" />
+            <input type="hidden" name="pickup" value="{{ requests.pickup }}" />
+            <input type="hidden" name="destination" value="{{ requests.destination }}" />
+            <input type="hidden" name="status" value="rejected" />
+            <input type="hidden" name="created_at" value="{{ requests.created_at }}" />
+            <input type="hidden" name="updated_at" value="{{ requests.updated_at }}" />
+            <button type="submit">Reject</button>
+          </form>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <script
+      type="module"
+      src="{{url_for('static', filename='scripts/driver_home.js')}}"
+    ></script>
   </body>
 </html>

@@ -37,17 +37,18 @@ const cancelHtml = function(){
   window.location.reload();
 
 }
+function handleTaxiClick(event) {
+  for (let j = 0; j < taxies.length; j++) {
+    taxies[j].classList.remove('selected');
+  }
+  event.target.classList.add('selected');
+}
 for (let i = 0; i < taxies.length; i++) {
-  taxies[i].addEventListener('click', () => {
-    for (let j = 0; j < taxies.length; j++) {
-      taxies[j].classList.remove('selected');
-    }
-    taxies[i].classList.add('selected');
-  });
+  taxies[i].addEventListener('click', handleTaxiClick);
 }
 
 // check if user has already submitted a request
-async function checkRequest() {
+async function checkRequest(route) {
   const res = await fetch('/ride/request/status', {
     method: 'GET',
     credentials: 'include',
@@ -61,13 +62,34 @@ async function checkRequest() {
     alert("You have a pending request")
     startLocation.value = resData.pickup;
     endLocation.value = resData.destination;
+    for (let i = 0; i < taxies.length; i++) {
+      taxies[i].removeEventListener('click', handleTaxiClick);
+    }
+    route(
+      { geometry: { location: startLocation.value } },
+      { geometry: { location: endLocation.value } }
+    );
     setTimeout(() => {
       pendingHtml() 
     }
     , 500);
+    const checkStatusInterval = setInterval(async () => {
+      const checkRes = await fetch('/ride/request/status', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const checkResData = await checkRes.json();
+      console.log(checkResData);
+
+      if (checkResData.status === 'accepted') {
+        clearInterval(checkStatusInterval); // Stop polling
+        window.location.href = '/dashboard'; // Redirect to dashboard or handle accordingly
+      }
+    }, 5000);
+  
   }
 }
-checkRequest()
 
 const centerLocation = { lat: 1.3521, lng: 103.8198 };
 initMap(centerLocation);
@@ -158,6 +180,7 @@ async function initMap(centerLocation) {
     draggable: false,
     suppressMarkers: false,
   });
+  checkRequest(route);
 
   const originAutoComplete = new Autocomplete(startLocation, {
     types: ['geocode'],
