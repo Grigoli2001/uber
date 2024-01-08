@@ -84,18 +84,34 @@ def ride_request():
     return jsonify({'status': 'pending', 'message': 'Waiting for driver acceptance'}), 200
 
 @login_required
-@root.route('/ride/request/status', methods=['POST'])
+@root.route('/ride/request/status', methods=['GET'])
 def ride_request_status():
     if not current_user.is_authenticated:
         return redirect(url_for('login_blueprint.login_logic'))
-    data = request.json
     user_id = current_user.get_id()
     logging.info(f'User ID: {user_id}')
     db = client['uber']
     collection = db['ride_requests']
     ride_request = collection.find_one({'user_id': user_id})
     if ride_request['status'] == 'pending':
-        return jsonify({'status': ride_request['status'], 'message': 'Waiting for driver acceptance'}), 200
+        return jsonify({'status': ride_request['status'], 'message': 'Waiting for driver acceptance', 'pickup' : ride_request['pickup'], 'destination' : ride_request['destination']}), 200
     elif ride_request['status'] == 'accepted':
         return jsonify({'status': ride_request['status'], 'message': 'Driver accepted your request'}), 200
+    return jsonify({'status': 'not_found', 'message': 'No ride request found'}), 404
+
+@login_required
+@root.route('/ride/request/cancel', methods=['GET'])
+def ride_request_cancel():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login_blueprint.login_logic'))
+    user_id = current_user.get_id()
+    logging.info(f'User ID: {user_id}')
+    db = client['uber']
+    collection = db['ride_requests']
+    ride_request = collection.find_one({'user_id': user_id})
+    if ride_request['status'] == 'pending':
+        collection.delete_one({'user_id': user_id})
+        return jsonify({'status': 'success', 'message': 'Ride request cancelled'}), 200
+    elif ride_request['status'] == 'accepted':
+        return jsonify({'status': 'error', 'message': 'Cannot cancel ride request after driver acceptance'}), 400
     return jsonify({'status': 'not_found', 'message': 'No ride request found'}), 404

@@ -9,6 +9,34 @@ const mapDiv = document.getElementById('map');
 const loader = document.getElementById('loader');
 const taxies = document.getElementsByClassName('taxies');
 const requestRideForm = document.getElementById('requestRideForm');
+const requestBtn = document.getElementById('requestRideBtn');
+const cancelBtn = document.getElementById('cancelRideBtn');
+const statusH4 = document.getElementById('statusH4')
+const statusSpan = document.getElementById('status');
+const form = document.getElementById('directionForm');
+const taxi_container = document.getElementById('taxi_container');
+const sedanPrice = document.getElementById('sedanPrice');
+const vanPrice = document.getElementById('vanPrice');
+const taxiPrice = document.getElementById('taxiPrice');
+const submitBtn = document.getElementById('submitBtn');
+const pendingHtml = function(){
+
+  requestBtn.style.display = 'none'
+  cancelBtn.style.display = 'flex'
+  statusH4.style.display = 'flex'
+  statusSpan.innerHTML = "Pending"
+  submitBtn.click()
+
+}
+
+const cancelHtml = function(){
+  requestBtn.style.display = 'block'
+  cancelBtn.style.display = 'none'
+  statusH4.style.display = 'none'
+  statusSpan.innerHTML = ""
+  window.location.reload();
+
+}
 for (let i = 0; i < taxies.length; i++) {
   taxies[i].addEventListener('click', () => {
     for (let j = 0; j < taxies.length; j++) {
@@ -17,22 +45,30 @@ for (let i = 0; i < taxies.length; i++) {
     taxies[i].classList.add('selected');
   });
 }
-// Get current location
-// navigator.geolocation.getCurrentPosition(
-//   (position) => {
-//     const { latitude, longitude } = position.coords;
-//     console.log(latitude, longitude);
-//     console.log(position);
-//     location = true;
-//     currentLocation = { lat: latitude, lng: longitude };
-//     initMap(currentLocation);
-//   },
-//   (error) => {
-//     console.log(error);
-//     const centerLocation = { lat: 1.3521, lng: 103.8198 };
-//     initMap(centerLocation);
-//   }
-// );
+
+// check if user has already submitted a request
+async function checkRequest() {
+  const res = await fetch('/ride/request/status', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  const resData = await res.json();
+  console.log(resData);
+  if (resData.status === 'accepted') {
+    window.location.href = '/dashboard';
+  }
+  else if (resData.status === 'pending'){
+    alert("You have a pending request")
+    startLocation.value = resData.pickup;
+    endLocation.value = resData.destination;
+    setTimeout(() => {
+      pendingHtml() 
+    }
+    , 500);
+  }
+}
+checkRequest()
+
 const centerLocation = { lat: 1.3521, lng: 103.8198 };
 initMap(centerLocation);
 
@@ -274,11 +310,7 @@ async function initMap(centerLocation) {
   } catch (err) {
     console.log(err);
   }
-  const form = document.getElementById('directionForm');
-  const taxi_container = document.getElementById('taxi_container');
-  const sedanPrice = document.getElementById('sedanPrice');
-  const vanPrice = document.getElementById('vanPrice');
-  const taxiPrice = document.getElementById('taxiPrice');
+  
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -339,6 +371,9 @@ async function initMap(centerLocation) {
     console.log(resData);
 
     if (resData.status === 'pending') {
+
+      pendingHtml()
+
       const checkStatusInterval = setInterval(async () => {
         const checkRes = await fetch('/ride/request/status', {
           method: 'GET',
@@ -360,6 +395,24 @@ async function initMap(centerLocation) {
     }
   }
 )};
+
+const cancelRideForm = document.getElementById('cancelRideForm');
+cancelRideForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!confirm('Are you sure you want to cancel the ride?')) {
+    return;
+  }
+  const res = await fetch('/ride/request/cancel', {
+    method: 'GET',
+    credentials: 'include',
+  });
+  const resData = await res.json();
+  console.log(resData);
+  if (resData.status === 'success') {
+    alert(resData.message);
+    cancelHtml()
+  }
+});
 
 
 // Prices for each car type
