@@ -135,3 +135,17 @@ def ride_request_cancel():
         return jsonify({'status': 'error', 'message': 'Cannot cancel ride request after driver acceptance'}), 400
     return jsonify({'status': 'not_found', 'message': 'No ride request found'}), 404
 
+# dashboard
+@login_required
+@root.route('/dashboard', methods=['GET'])
+def dashboard():
+    if not current_user.is_authenticated:
+        return redirect(url_for('login_blueprint.login_logic'))
+    db = client['uber']
+    collection = db['ride_requests']
+    id = current_user.get_id()
+    ride_requests = collection.find_one({'user_id': id})
+    if ride_requests:
+        if ride_requests['status'] == 'accepted':
+            return render_template('user/user_dashboard.html', ride_requests=ride_requests)
+    return render_template(url_for('root.ride'))

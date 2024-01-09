@@ -5,5 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body></body>
+  <body>
+    {% include 'components/ride_navbar.html' %}
+
+    <h1>{{ride_requests}}</h1>
+    <h1>Pick Up Address: <span>{{ride_requests.pickup}}</span></h1>
+    <h1>Destination Address: <span>{{ride_requests.destination}}</span></h1>
+    <h1>Time of the order: <span>{{ride_requests.created_at}}</span></h1>
+    <h1>Driver Accepted at : <span>{{ride_requests.updated_at}}</span></h1>
+    <h1>Price: <span>{{ride_requests.price}} $</span></h1>
+  </body>
 </html>

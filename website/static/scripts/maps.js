@@ -38,10 +38,18 @@ const cancelHtml = function(){
 
 }
 function handleTaxiClick(event) {
+  // First, remove the 'selected' class from all taxies
   for (let j = 0; j < taxies.length; j++) {
     taxies[j].classList.remove('selected');
   }
-  event.target.classList.add('selected');
+  
+  // Determine which taxi was clicked and add the 'selected' class to it
+  for (let i = 0; i < taxies.length; i++) {
+    if (taxies[i] === event.target) {
+      taxies[i].classList.add('selected');
+      break; // Exit the loop once the clicked taxi is found and class is added
+    }
+  }
 }
 for (let i = 0; i < taxies.length; i++) {
   taxies[i].addEventListener('click', handleTaxiClick);
