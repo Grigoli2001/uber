@@ -9,7 +9,7 @@ import logging
 login_blueprint = Blueprint('login_blueprint',__name__)
 
 
-
+is_driver = False
 
 class User(UserMixin):
     def __init__(self,id):
@@ -17,7 +17,6 @@ class User(UserMixin):
         self.email = None
         self.password = None
         self.profile_pic = 'https://static.vecteezy.com/system/resources/thumbnails/003/337/584/small/default-avatar-photo-placeholder-profile-icon-vector.jpg'
-        self.fullname = None
         self.authenticated = False
         self.role = None # admin, user, driver
         self.car_type = None
@@ -25,7 +24,7 @@ class User(UserMixin):
         self.phone_number = None
         self.license_pic = None
         self.car_pic = None
-        
+        self.logged_in_as_driver = is_driver
     def is_anonymous(self):
          return False
     def is_authenticated(self):
@@ -58,10 +57,12 @@ class User(UserMixin):
         return self.license_pic
     def getCarPic(self):
         return self.car_pic
+    def is_logged_in_as_driver(self):
+        return self.logged_in_as_driver
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id,is_driver = False):
      # Fetch user data from the database
     db = conn_db()
     cursor = db.cursor()
@@ -86,7 +87,11 @@ def load_user(user_id):
             cur_user.license_pic = user[10]
         if user[11]:
             cur_user.car_pic = user[11]
-        
+        cur_user.logged_in_as_driver = is_driver
+        if is_driver:
+            logging.info("user is driver")
+        else:
+            logging.info("user is rider")
         return cur_user
 
     return None  # Return None if no user is found
@@ -227,7 +232,8 @@ def verifyOtpDriver():
             cursor.execute('SELECT * FROM users WHERE email = ? and role = ?',(session['email'], 'driver'))
             user = cursor.fetchone()
             print(user)
-            Us = load_user(user[0])
+            is_driver = True
+            Us = load_user(user[0],is_driver)
             login_user(Us)
             session.pop('email', None)
             return redirect(url_for('driver.home'))

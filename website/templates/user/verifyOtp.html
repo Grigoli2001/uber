@@ -9,7 +9,7 @@
     {% include 'components/blank_navbar.html' %}
     <div class="content_container">
       <div class="login_wrapper">
-        <h2>Enter the OTP sent to your phone number</h2>
+        <h2>Enter the OTP sent to your email</h2>
         <form action="" autocomplete="off" method="post">
           {{ form.csrf_token }} {{ form.hidden_tag() }}{{
           form.otp1(class="otp_input", autocomplete="false",

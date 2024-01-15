@@ -22,24 +22,6 @@ def home():
     return render_template('driver/driver_home.html', ride_requests=ride_requests)
 
 
-# this is how I save ride request
-#  db = client['uber']
-#     collection = db['ride_requests']
-
-#     # Check if user has already requested a ride
-#     ride_request = collection.find_one({'user_id': user_id})
-#     if ride_request:
-#         if ride_request['status'] in ['pending', 'accepted']:
-#             # return an error message
-#             return jsonify({'status': 'error', 'message': 'You have already requested a ride'}), 400
-#     collection.insert_one({
-#         'user_id': user_id,
-#         'pickup': pickup,
-#         'destination': destination,
-#         'status': 'pending',
-#         'created_at': datetime.now(),
-#         'updated_at': datetime.now()
-#     })
 @driver.route('/ride/accept', methods=['POST'])
 def accept_ride():
     if not current_user.is_authenticated:
@@ -57,7 +39,82 @@ def accept_ride():
     return jsonify({'status': 'success', 'message': 'Ride accepted'}), 200
 
 
-# check for changes in ride_requests collection to notify the socket
+# @driver.route('/ride/reject', methods=['POST'])
+# def reject_ride():
+#     if not current_user.is_authenticated:
+#         return redirect(url_for('login_blueprint.login_logic'))
+#     data = request.json
+#     ride_id = data['id']
+#     driver_id = current_user.get_id()
+#     logging.info(f'Ride ID: {ride_id}')
+#     db = client['uber']
+#     collection = db['ride_requests']
+#     collection.update_one({'_id': ObjectId(ride_id)}, {'$set': {'status': 'rejected'}})
+
+#     # send a socket message to the user
+#     emit('ride_updated', {'message': 'Ride status updated!'}, broadcast=True, namespace='/')
+
+#     return jsonify({'status': 'success', 'message': 'Ride rejected'}), 200
+
+@driver.route('/ride/reject', methods=['POST'])
+def reject_ride():
+    print("rejecting ride")
+    if not current_user.is_authenticated:
+        return redirect(url_for('login_blueprint.login_logic'))
+    
+    data = request.json
+    ride_id = data['id']
+    driver_id = str(current_user.get_id())  # Convert driver_id to string
+    print(driver_id)
+    
+    logging.info(f'Ride ID: {ride_id}')
+    db = client['uber']
+    collection = db['ride_requests']
+    ride_request = collection.find_one({'_id': ObjectId(ride_id)})
+    all_requests_collection = db['all_requests']
+    if not ride_request:
+        logging.info('Ride not found')
+        return jsonify({'status': 'error', 'message': 'Ride not found'}), 404
+    
+    if ride_request['status'] == 'accepted':
+        logging.info('Ride already accepted')
+        return jsonify({'status': 'error', 'message': 'Ride already accepted'}), 400
+    
+    print(ride_request['request_sent_to_driver'])
+    
+    # Extract driver IDs from the array of dictionaries
+    driver_ids = [str(driver_info['id']) for driver_info in ride_request['request_sent_to_driver']]
+    print(driver_ids)
+    
+    if driver_id in driver_ids:
+        print("driver found in request")
+        
+        # Update the status for the specific driver
+        for driver_info in ride_request['request_sent_to_driver']:
+            if str(driver_info['id']) == driver_id:
+                logging.info('Updating status for driver')
+                # updating in memory
+                driver_info['status'] = 'rejected'
+
+                # update the status for the driver in mongodb
+                result = collection.update_one({'_id': ObjectId(ride_id), 'request_sent_to_driver.id': int(driver_id)}, {'$set': {'request_sent_to_driver.$.status': 'rejected'}})
+                print(result)
+                break
+        print(all(driver_info['status'] == 'rejected' for driver_info in ride_request['request_sent_to_driver']))
+        if all(driver_info['status'] == 'rejected' for driver_info in ride_request['request_sent_to_driver']):
+            logging.info('All drivers rejected the ride')
+            #  remove from the ride_requests collection
+            result = collection.delete_one({'_id': ObjectId(ride_id)})
+            print(result)
+            emit('ride_updated', {'message': 'Ride status updated!'}, broadcast=True, namespace='/')
+            return jsonify({'status': 'success', 'message': 'Ride rejected'}), 200
+        else:
+            emit('ride_updated', {'message': 'Driver response updated!'}, broadcast=True, namespace='/')
+            return jsonify({'status': 'success', 'message': 'Driver response updated'}), 200
+    else:
+        return jsonify({'status': 'error', 'message': 'Driver not found in request'}), 400
+
+# # check for changes in ride_requests collection to notify the socket
 def check_for_updates():
     db = client['uber']
     logging.info('Starting thread for checking updates.')

@@ -68,6 +68,8 @@ def ride_request():
     db = client['uber']
     collection = db['ride_requests']
     all_requests = db['all_requests']
+    driver_ids = get_driver_id_randomly(3)
+    logging.info(f'Driver IDs: {driver_ids}')
     # Check if user has already requested a ride
     ride_request = collection.find_one({'user_id': user_id})
     if ride_request:
@@ -81,7 +83,10 @@ def ride_request():
         'status': 'pending',
         'created_at': datetime.now().strftime("%H:%M"),
         'updated_at': datetime.now().strftime("%H:%M"),
-        'price': price
+        'price': price,
+        # here we will store the driver id to whom the request was sent
+        'request_sent_to_driver': driver_ids,
+        'driver_id': ''
     })
     all_requests.insert_one({
         'user_id': user_id,
@@ -90,7 +95,9 @@ def ride_request():
         'status': 'pending',
         'created_at': datetime.now().strftime("%H:%M"),
         'updated_at': datetime.now().strftime("%H:%M"),
-        'price': price
+        'price': price,
+        'request_sent_to_driver': driver_ids,
+        'driver_id': ''
     })
 
     return jsonify({'status': 'pending', 'message': 'Waiting for driver acceptance'}), 200
@@ -149,3 +156,11 @@ def dashboard():
         if ride_requests['status'] == 'accepted':
             return render_template('user/user_dashboard.html', ride_requests=ride_requests)
     return render_template(url_for('root.ride'))
+
+# get driver ids randomly from sqlite 
+def get_driver_id_randomly(number_of_drivers):
+    db = conn_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT id FROM users WHERE role = ? ORDER BY RANDOM() LIMIT ?', ('driver',number_of_drivers,))
+    drivers = [{'id': driver[0], 'status': 'pending'} for driver in cursor.fetchall()]  # Use a list of dictionaries
+    return drivers
